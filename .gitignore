@@ -1,0 +1,10 @@
+venv/
+__pycache__/
+*.pyc
+.env
+debug_log.txt
+.ruff_cache/
+.streamlit/
+finetuning/qlora-code-review-adapter/
+.DS_Store
+Thumbs.db
