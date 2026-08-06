@@ -89,28 +89,3 @@ python -m agent.graph --diff path/to/your.diff
 ```bash
 streamlit run demo/app.py
 ```
-
-## What to say about this in an interview
-
-- **Why fine-tune instead of just prompting GPT-4/Claude?** Cost at scale,
-  latency, and specialization — a small fine-tuned model can match a much
-  larger general model *on a narrow task* once tuned on domain examples.
-  Be ready to show your eval numbers (fine-tuned vs. base model, on a
-  held-out set) — this is the single most common follow-up question.
-- **Why LangGraph over a simple chain?** Because review is not linear:
-  the agent needs to branch (call different tools depending on what it
-  finds), retry, and escalate — that's a state machine, not a pipeline.
-- **What makes this "agentic" and not just automation?** The confidence
-  scorer: the agent decides *for itself* whether to trust its output or
-  gather more information / defer to a human, rather than always doing the
-  same fixed sequence of steps.
-
-## Suggested next steps (mention these as "future work" — shows maturity)
-- Swap the static FAISS index for a hosted vector DB and index your own
-  org's past PRs
-- Add a second fine-tuned model as a "critic" that reviews the reviewer's
-  output (self-consistency check)
-- Wrap the whole agent as an **MCP server** so it can be called from Claude
-  Desktop / other MCP clients directly on a GitHub repo
-- Add LangSmith or a simple structured logger for full run tracing (agent
-  observability is a hiring keyword in its own right)
