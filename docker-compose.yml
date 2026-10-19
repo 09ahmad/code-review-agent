@@ -1,0 +1,72 @@
+version: '3.8'
+
+services:
+  code-review-agent:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: code-review-agent
+    ports:
+      - "8501:8501"
+    volumes:
+      - ./finetuning/qlora-code-review-adapter:/app/finetuning/qlora-code-review-adapter:ro
+      - ./debug_log.txt:/app/debug_log.txt
+    environment:
+      - ADAPTER_PATH=/app/finetuning/qlora-code-review-adapter
+      - PYTHONUNBUFFERED=1
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8501/_stcore/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+
+  code-review-cli:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: code-review-cli
+    entrypoint: ["python", "-m", "agent.graph"]
+    volumes:
+      - ./finetuning/qlora-code-review-adapter:/app/finetuning/qlora-code-review-adapter:ro
+      - ${PWD}:/workspace:ro
+    environment:
+      - ADAPTER_PATH=/app/finetuning/qlora-code-review-adapter
+    profiles:
+      - cli
+
+  test:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: code-review-tests
+    entrypoint: ["pytest"]
+    command: ["tests/", "-v", "--tb=short"]
+    volumes:
+      - ./finetuning/qlora-code-review-adapter:/app/finetuning/qlora-code-review-adapter:ro
+      - ./tests:/app/tests:ro
+      - ./agent:/app/agent:ro
+    environment:
+      - ADAPTER_PATH=/app/finetuning/qlora-code-review-adapter
+      - PYTHONUNBUFFERED=1
+    profiles:
+      - test
+
+  test-coverage:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: code-review-tests-coverage
+    entrypoint: ["pytest"]
+    command: ["tests/", "--cov=agent", "--cov-report=term-missing", "--cov-report=html:/app/htmlcov"]
+    volumes:
+      - ./finetuning/qlora-code-review-adapter:/app/finetuning/qlora-code-review-adapter:ro
+      - ./tests:/app/tests:ro
+      - ./agent:/app/agent:ro
+      - ./htmlcov:/app/htmlcov
+    environment:
+      - ADAPTER_PATH=/app/finetuning/qlora-code-review-adapter
+      - PYTHONUNBUFFERED=1
+    profiles:
+      - test

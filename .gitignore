@@ -8,3 +8,4 @@ debug_log.txt
 finetuning/qlora-code-review-adapter/
 .DS_Store
 Thumbs.db
+.venv
